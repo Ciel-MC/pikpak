@@ -65,7 +65,7 @@
                 <letter-a></letter-a>
               </n-icon>
             </template>
-            推送到Aria2 - ovo
+            推送到Aria2 - ouo
           </n-tooltip>
         </div>
         <div class="toolbar-item" @click="copyAll">
@@ -771,10 +771,11 @@ const aria2All = async () => {
         nRef.value.content = nRef.value?.content + '\r\n' + '推送' + data.parent + '/' + data.name + '成功'
       }
     })
-    console.log("Awaiting promises...", promises);
-    const chunkSize = 10;
+    const chunkSize = 3;
     for (let i = 0; i < promises.length; i += chunkSize) {
-      await Promise.all(promises.slice(i, i + chunkSize));
+      const proms = promises.slice(i, i + chunkSize);
+      console.log('awaiting: ', proms)
+      await Promise.all(proms);
     }
     setTimeout(() => {
       nRef.value?.destroy()
