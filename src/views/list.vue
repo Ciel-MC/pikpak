@@ -765,14 +765,19 @@ const aria2All = async () => {
   }
   const postAll = async () => {
     const files = downFileList.value
+    const total = files.length
     const chunkSize = 100;
+    var n = 0
     for (let i = 0; i < files.length; i += chunkSize) {
       const proms = files.slice(i, i + chunkSize).map(async (data: any) => {
-        const res = await getFile(data.id)
-        aria2Post(res, data.parent)
-        if (nRef.value?.content) {
-          nRef.value.content = nRef.value?.content + '\r\n' + '推送' + data.parent + '/' + data.name + '成功'
-        }
+        return getFile(data.id).then((res: any) => {
+          aria2Post(res, data.parent)
+          n++
+          if (nRef.value?.content) {
+            //nRef.value.content = nRef.value?.content + '\r\n' + '推送' + data.parent + '/' + data.name + '成功'
+            nRef.value.content = '已推送' + n + '/' + total + '个文件'
+          }
+        })
       })
       await Promise.all(proms);
     }
@@ -873,7 +878,7 @@ const aria2Post = async (res: any, dir?: string) => {
     if (response.error && response.error.message) {
       window.$message.error('推送失败：' + response.error.message)
     } else if (response.result) {
-      window.$message.success('推送成功')
+      //window.$message.success('推送成功')
     }
   } catch (error) {
     console.error('Error:', error)
