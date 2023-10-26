@@ -1007,6 +1007,9 @@ const getFolderFile = async (id?: string, page?: string, parent?: string) => {
         size: item.size,
         hash: item.hash
       })
+      if (nRef.value) {
+        nRef.value.content = '已获取到' + downFileList.value.length + '个文件'
+      }
     }
   }
   return 1
