@@ -768,21 +768,22 @@ const aria2All = async () => {
     const total = files.length
     const chunkSize = 100;
     var n = 0
+    const start_time = new Date().getTime()
     for (let i = 0; i < files.length; i += chunkSize) {
       const proms = files.slice(i, i + chunkSize).map(async (data: any) => {
         return getFile(data.id).then((res: any) => {
           aria2Post(res, data.parent)
           n++
           if (nRef.value?.content) {
-            //nRef.value.content = nRef.value?.content + '\r\n' + '推送' + data.parent + '/' + data.name + '成功'
-            nRef.value.content = '已推送' + n + '/' + total + '个文件'
+            const time_taken = (new Date().getTime() - start_time)/1000
+            nRef.value.content = '已推送' + n + '/' + total + '个文件' + '\r\n' + '共耗时' + time_taken + '秒' + '\r\n' + '平均' + n/time_taken + '文件每秒'
           }
         })
       })
-      proms.push(new Promise((resolve) => {
-        setTimeout(resolve, 1000)
-      }))
       await Promise.all(proms);
+      await new Promise((resolve) => {
+        setTimeout(resolve, 1000)
+      })
     }
     setTimeout(() => {
       nRef.value?.destroy()
