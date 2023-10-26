@@ -766,7 +766,7 @@ const aria2All = async () => {
   const postAll = async () => {
     const files = downFileList.value
     const total = files.length
-    const chunkSize = 100;
+    const chunkSize = 50;
     var n = 0
     for (let i = 0; i < files.length; i += chunkSize) {
       const proms = files.slice(i, i + chunkSize).map(async (data: any) => {
