@@ -766,7 +766,7 @@ const aria2All = async () => {
   const postAll = async () => {
     const files = downFileList.value
     const total = files.length
-    const chunkSize = 50;
+    const chunkSize = 100;
     var n = 0
     for (let i = 0; i < files.length; i += chunkSize) {
       const proms = files.slice(i, i + chunkSize).map(async (data: any) => {
@@ -779,6 +779,9 @@ const aria2All = async () => {
           }
         })
       })
+      proms.push(new Promise((resolve) => {
+        setTimeout(resolve, 1000)
+      }))
       await Promise.all(proms);
     }
     setTimeout(() => {
