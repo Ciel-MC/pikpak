@@ -65,7 +65,7 @@
                 <letter-a></letter-a>
               </n-icon>
             </template>
-            推送到Aria2
+            推送到Aria2 - ovo
           </n-tooltip>
         </div>
         <div class="toolbar-item" @click="copyAll">
@@ -763,27 +763,6 @@ const aria2All = async () => {
   if (!aria2Dir.value && aria2Data.value.dir) {
     await getAria2Dir()
   }
-  // const postOne = () => {
-  //   getFile(downFileList.value[0].id)
-  //     .then(async res => {
-  //       const data:any = downFileList.value.shift()
-  //       aria2Post(res, data.parent)
-  //       if(nRef.value?.content) {
-  //         nRef.value.content = nRef.value?.content + '\r\n' + '推送' + data.parent + '/' + data.name + '成功'
-  //       }
-  //       if(downFileList.value.length) {
-  //         setTimeout(() => {
-  //           postOne()
-  //         }, 3000)
-  //       } else {
-  //         setTimeout(() => {
-  //           nRef.value?.destroy()
-  //           allLoding.value = false
-  //         }, 1000);
-  //       }
-  //     })
-  // }
-  // postOne()
   const postAll = async () => {
     const promises = downFileList.value.map(async (data: any) => {
       const res = await getFile(data.id)
@@ -792,8 +771,8 @@ const aria2All = async () => {
         nRef.value.content = nRef.value?.content + '\r\n' + '推送' + data.parent + '/' + data.name + '成功'
       }
     })
-    // await Promise.all(promises)
-    const chunkSize = 20;
+    console.log("Awaiting promises...", promises);
+    const chunkSize = 10;
     for (let i = 0; i < promises.length; i += chunkSize) {
       await Promise.all(promises.slice(i, i + chunkSize));
     }
@@ -892,7 +871,7 @@ const aria2Post = async (res: any, dir?: string) => {
       })
     }).then(r => r.json())
     if (response.error && response.error.message) {
-      window.$message.error(response.error.message)
+      window.$message.error('推送失败：' + response.error.message)
     } else if (response.result) {
       window.$message.success('推送成功')
     }
