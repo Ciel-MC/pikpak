@@ -65,7 +65,7 @@
                 <letter-a></letter-a>
               </n-icon>
             </template>
-            推送到Aria2 - ouo
+            推送到Aria2 - oWo
           </n-tooltip>
         </div>
         <div class="toolbar-item" @click="copyAll">
@@ -764,17 +764,16 @@ const aria2All = async () => {
     await getAria2Dir()
   }
   const postAll = async () => {
-    const promises = downFileList.value.map(async (data: any) => {
-      const res = await getFile(data.id)
-      await aria2Post(res, data.parent)
-      if (nRef.value?.content) {
-        nRef.value.content = nRef.value?.content + '\r\n' + '推送' + data.parent + '/' + data.name + '成功'
-      }
-    })
-    const chunkSize = 3;
-    for (let i = 0; i < promises.length; i += chunkSize) {
-      const proms = promises.slice(i, i + chunkSize);
-      console.log('awaiting: ', proms)
+    const files = downFileList.value
+    const chunkSize = 10;
+    for (let i = 0; i < files.length; i += chunkSize) {
+      const proms = files.slice(i, i + chunkSize).map(async (data: any) => {
+        const res = await getFile(data.id)
+        aria2Post(res, data.parent)
+        if (nRef.value?.content) {
+          nRef.value.content = nRef.value?.content + '\r\n' + '推送' + data.parent + '/' + data.name + '成功'
+        }
+      })
       await Promise.all(proms);
     }
     setTimeout(() => {
