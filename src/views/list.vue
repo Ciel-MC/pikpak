@@ -762,29 +762,44 @@ import axios from 'axios';
     }
     await getAllFile()
     if(!aria2Dir.value && aria2Data.value.dir) {
-      await getAria2Dir()
+      getAria2Dir()
     }
-    const postOne =  () => {
-      getFile(downFileList.value[0].id)
-        .then(async res => {
-          const data:any = downFileList.value.shift()
-          await aria2Post(res, data.parent)
+    // const postOne = () => {
+    //   getFile(downFileList.value[0].id)
+    //     .then(async res => {
+    //       const data:any = downFileList.value.shift()
+    //       aria2Post(res, data.parent)
+    //       if(nRef.value?.content) {
+    //         nRef.value.content = nRef.value?.content + '\r\n' + '推送' + data.parent + '/' + data.name + '成功'
+    //       }
+    //       if(downFileList.value.length) {
+    //         setTimeout(() => {
+    //           postOne()
+    //         }, 3000)
+    //       } else {
+    //         setTimeout(() => {
+    //           nRef.value?.destroy()
+    //           allLoding.value = false
+    //         }, 1000);
+    //       }
+    //     })
+    // }
+    // postOne()
+    const postAll = () => {
+      downFileList.value.forEach((data: any) => {
+        getFile(data.id).then((res:any) => {
+          aria2Post(res, data.parent)
           if(nRef.value?.content) {
             nRef.value.content = nRef.value?.content + '\r\n' + '推送' + data.parent + '/' + data.name + '成功'
           }
-          if(downFileList.value.length) {
-            setTimeout(() => {
-              postOne()
-            }, 3000)
-          } else {
-            setTimeout(() => {
-              nRef.value?.destroy()
-              allLoding.value = false
-            }, 1000);
-          }
         })
+      })
+      setTimeout(() => {
+        nRef.value?.destroy()
+        allLoding.value = false
+      }, 1000);
     }
-    postOne()
+    postAll()
   }
   const downFile = (id:string) => {
     getFile(id)
