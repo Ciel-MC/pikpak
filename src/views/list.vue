@@ -749,7 +749,7 @@ const getAllFile = async (title?: string) => {
           hash: item.hash
         })
       } else {
-        await getFloderFile(item.id, '', item.name)
+        await getFolderFile(item.id, '', item.name)
       }
     }
   }
@@ -761,7 +761,7 @@ const aria2All = async () => {
   }
   await getAllFile()
   if (!aria2Dir.value && aria2Data.value.dir) {
-    getAria2Dir()
+    await getAria2Dir()
   }
   // const postOne = () => {
   //   getFile(downFileList.value[0].id)
@@ -792,7 +792,11 @@ const aria2All = async () => {
         nRef.value.content = nRef.value?.content + '\r\n' + '推送' + data.parent + '/' + data.name + '成功'
       }
     })
-    await Promise.all(promises)
+    // await Promise.all(promises)
+    const chunkSize = 20;
+    for (let i = 0; i < promises.length; i += chunkSize) {
+      await Promise.all(promises.slice(i, i + chunkSize));
+    }
     setTimeout(() => {
       nRef.value?.destroy()
       allLoding.value = false
@@ -836,7 +840,7 @@ const downFile = (id: string) => {
     })
 }
 const aria2Dir = ref()
-const getAria2Dir = () => {
+const getAria2Dir = async () => {
   let postData: any = {
     id: '',
     jsonrpc: '2.0',
@@ -847,17 +851,15 @@ const getAria2Dir = () => {
   if (aria2Data.value.token) {
     postData.params.splice(0, 0, 'token:' + aria2Data.value.token)
   }
-  fetch(aria2Data.value.host, {
-    method: 'POST',
-    body: JSON.stringify(postData),
-    headers: new Headers({
-      'Content-Type': 'application/json'
-    })
-  })
-    .then(response => response.json())
-    .then(res => {
-      aria2Dir.value = res?.result?.dir || ''
-    })
+  const response = await
+    fetch(aria2Data.value.host, {
+      method: 'POST',
+      body: JSON.stringify(postData),
+      headers: new Headers({
+        'Content-Type': 'application/json'
+      })
+    }).then(res => res.json())
+  aria2Dir.value = response?.result?.dir || ''
 }
 const aria2Post = async (res: any, dir?: string) => {
   let url = res.data.web_content_link
@@ -992,7 +994,7 @@ const namePost = () => {
     })
 }
 const downFileList = ref<{ [key: string]: any }[]>([])
-const getFloderFile = async (id?: string, page?: string, parent?: string) => {
+const getFolderFile = async (id?: string, page?: string, parent?: string) => {
   const res: any = await http.get('https://api-drive.mypikpak.com/drive/v1/files', {
     params: {
       parent_id: id || undefined,
@@ -1007,12 +1009,12 @@ const getFloderFile = async (id?: string, page?: string, parent?: string) => {
   })
   const { files, next_page_token } = res.data
   if (next_page_token) {
-    await getFloderFile(id, next_page_token, parent)
+    await getFolderFile(id, next_page_token, parent)
   }
   for (let i in files) {
     const item = files[i]
     if (item.kind === 'drive#folder') {
-      await getFloderFile(item.id, '', (parent ? (parent + '/') : '') + item.name)
+      await getFolderFile(item.id, '', (parent ? (parent + '/') : '') + item.name)
     } else {
       downFileList.value.push({
         name: item.name,
